@@ -6,6 +6,8 @@ import sys
 import urllib
 import pandas as pd
 import os
+from openpyxl import load_workbook
+from openpyxl.drawing.image import Image
 
 print("아마존 닷컴의 분야별 Best Seller 상품 정보 추출")
 
@@ -14,33 +16,30 @@ query_url = 'https://www.amazon.com/bestsellers?Id=NSGoogle'
 sec_names = ['Amazon Devices & Accessories', 'Amazon Launchpad', 'Appliances', 'Apps & Games', 'Arts, Crafts & Sewing',
             'Audible Books & Originals', 'Automotive', 'Baby', 'Beauty & Personal Care', 'Books', 'CDs & Vinyl', 'Camera & Photo',
             'Cell Phones & Accessories', 'Clothing, shoes & Jewelry', 'Collectible Currencies', 'Computers & Accessories', 
-            'Digital Music', 'Electronics', 'Entertainment Collectibles', 'Gift Cards', 'Grocery & Gourmet Food', 'Handmade Products', 
-            'Health & Household', 'Home & Kitchen', 'Industrial & Scientific', 'Kindle Store', 'Kitchen & Dining', 
-            'Magazine Subscriptions', 'Movies & TV', 'Musical Instruments', 'Office Products', 'Patio, Lawn & Garden', 'Pet Supplies',
-            'Prime Pantry', 'Smart Home', 'Software', 'Sports & Outdoors', 'Sports Collectibies', 'Tools & Home Improvemet',
-            'Toys & Games', 'Video Games']
+            'Digital Music', 'Electronics', 'Entertainment Collectibles', 'Gift Cards', 'Grocery & Gourmet Food',
+            'Handmade Products', 'Health & Household', 'Home & Kitchen', 'Industrial & Scientific', 'Kindle Store',
+            'Kitchen & Dining', 'Magazine Subscriptions', 'Movies & TV', 'Musical Instruments', 'Office Products',
+            'Patio, Lawn & Garden', 'Pet Supplies', 'Prime Pantry', 'Smart Home', 'Software', 'Sports & Outdoors',
+            'Sports Collectibies', 'Tools & Home Improvemet', 'Toys & Games', 'Video Games']
 
 print('실행')
-sec = int(1)
-# =============================================================================
-# sec = int(input('''
-#         1.Amazon Devices & Accessories     2.Amazon Launchpad               3.Appliances
-#         4.Apps & Games                     5.Arts, Crafts & Sewing          6.Audible Books & Originals
-#         7.Automotive                       8.Baby                           9.Beauty & Personal Care
-#         10.Books                           11.CDs & Vinyl                   12.Camera & Photo
-#         13.Cell Phones & Accessories       14.Clothing, shoes & Jewelry     15.Collectible Currencies
-#         16.Computers & Accessories         17.Digital Music                 18.Electronics
-#         19.Entertainment Collectibles      20.Gift Cards                    21.Grocery & Gourmet Food
-#         22.Handmade Products               23.Health & Household            24.Home & Kitchen
-#         25.Industrial & Scientific         26.Kindle Store                  27.Kitchen & Dining
-#         28.Magazine Subscriptions          29.Movies & TV                   30.Musical Instruments
-#         31.Office Products                 32.Patio, Lawn & Garden          33.Pet Supplies
-#         34.Prime Pantry                    35.Smart Home                    36.Software
-#         37.Sports & Outdoors               38.Sports Collectibies           39.Tools & Home Improvemet
-#         40.Toys & Games                    41.Video Games
-# 
-#         1.위 분야 중에서 자료를 수집할 분야의 번호를 선택하세요 : '''))
-# =============================================================================
+sec = int(input('''
+        1.Amazon Devices & Accessories     2.Amazon Launchpad               3.Appliances
+        4.Apps & Games                     5.Arts, Crafts & Sewing          6.Audible Books & Originals
+        7.Automotive                       8.Baby                           9.Beauty & Personal Care
+        10.Books                           11.CDs & Vinyl                   12.Camera & Photo
+        13.Cell Phones & Accessories       14.Clothing, shoes & Jewelry     15.Collectible Currencies
+        16.Computers & Accessories         17.Digital Music                 18.Electronics
+        19.Entertainment Collectibles      20.Gift Cards                    21.Grocery & Gourmet Food
+        22.Handmade Products               23.Health & Household            24.Home & Kitchen
+        25.Industrial & Scientific         26.Kindle Store                  27.Kitchen & Dining
+        28.Magazine Subscriptions          29.Movies & TV                   30.Musical Instruments
+        31.Office Products                 32.Patio, Lawn & Garden          33.Pet Supplies
+        34.Prime Pantry                    35.Smart Home                    36.Software
+        37.Sports & Outdoors               38.Sports Collectibies           39.Tools & Home Improvemet
+        40.Toys & Games                    41.Video Games
+
+        1.위 분야 중에서 자료를 수집할 분야의 번호를 선택하세요 : '''))
 cnt = int(1)#int(input("        2. 해당 분야에서 크롤링 할 건수는 몇건입니까?(1-100 건 사이 입력) : " ))
 f_dir = "E:/coding/3years/python/Amazon_Best_Seller_Info_Crawler/"#input("        3.파일을 저장할 폴더명만 쓰세요(예 : c:\\temp\\) : ")
 print("\n")
@@ -65,7 +64,7 @@ os.makedirs(ff_dir + '/images')
 
 ff_name = ff_dir + '\\' + s + '-' + query_txt + '-' + sec_name + '.txt'
 fc_name = ff_dir + '\\' + s + '-' + query_txt + '-' + sec_name + '.csv'
-fx_name = ff_dir + '\\' + s + '-' + query_txt + '-' + sec_name + '.xls'
+fx_name = ff_dir + '\\' + s + '-' + query_txt + '-' + sec_name + '.xlsx'
 fp_name = ff_dir + '\\images\\'
 
 
@@ -102,6 +101,7 @@ score2 = []
 sat_count2 = []
 store2 = []
 srcs = []
+imgs = []
 
 
 if cnt < 51:
@@ -127,7 +127,7 @@ if cnt < 51:
         #제품 이미지
         try:
             src  = li.find('span', class_='zg-text-center-align').find('img')['src']
-        except AttributeError:
+        except:
             src = ''
             
         #제품 설명
@@ -392,8 +392,9 @@ for i in range(0, len(srcs)):
     if(srcs[i] != ''):
         try:
             urllib.request.urlretrieve(srcs[i], fp_name + str(i) + '.jpg')
+            imgs.append(fp_name + str(i) + '.jpg')
         except:
-            continue
+            imgs.append('')
 
 #Step 5. 검색 결과를 다양한 형태로 저장하기
 
@@ -401,7 +402,7 @@ amazon_best_seller = pd.DataFrame()
 amazon_best_seller['판매순위'] = ranking2
 amazon_best_seller['제품소개'] = pd.Series(title3)
 amazon_best_seller['판매가격'] = pd.Series(price2)
-amazon_best_seller['상품명 갯수'] = pd.Series(sat_count2)
+amazon_best_seller['상품평 갯수'] = pd.Series(sat_count2)
 amazon_best_seller['상품평점'] = pd.Series(score2)
 
 #csv 형태로 저장
@@ -409,6 +410,25 @@ amazon_best_seller.to_csv(fc_name, encoding = "utf-8-sig", index = True)
 
 #엑셀 형태로 저장하기
 amazon_best_seller.to_excel(fx_name, index = True)
+
+#그림추가
+wb = load_workbook(filename = fx_name, read_only = False, data_only = False)
+ws = wb.active
+
+for i in range(0, len(imgs)):
+    if(imgs[i] != ''):
+        img = Image(imgs[i])
+        
+        cellNum = i + 2
+        
+        ws.row_dimensions[cellNum].height = img.height * 0.75 + 15
+        ws.column_dimensions['C'].width = img.width * 0.125
+        
+        ws.add_image(img, 'C' + str(cellNum))
+
+wb.save(fx_name)
+
+
 
 e_time = time.time()
 t_time = e_time - s_time
