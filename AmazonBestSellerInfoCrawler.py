@@ -256,3 +256,5 @@ for i in range(0, len(imgs)):
         ws.add_image(img, 'C' + str(cellNum))                           #이미지를 엑셀에 추가
 
 wb.save(fileName + '.xlsx')
+
+print("작업이 성공적으로 처리되었습니다.")
