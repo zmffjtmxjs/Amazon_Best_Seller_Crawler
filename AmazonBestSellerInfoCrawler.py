@@ -40,7 +40,7 @@ sec = int(input('''
         40.Toys & Games                    41.Video Games
 
         1.위 분야 중에서 자료를 수집할 분야의 번호를 선택하세요 : '''))
-cnt = int(1)#int(input("        2. 해당 분야에서 크롤링 할 건수는 몇건입니까?(1-100 건 사이 입력) : " ))
+cnt = int(20)#int(input("        2. 해당 분야에서 크롤링 할 건수는 몇건입니까?(1-100 건 사이 입력) : " ))
 f_dir = "E:/coding/3years/python/Amazon_Best_Seller_Info_Crawler/"#input("        3.파일을 저장할 폴더명만 쓰세요(예 : c:\\temp\\) : ")
 print("\n")
 
@@ -147,7 +147,7 @@ if cnt < 51:
     
         #가격
         try:
-          price = li.find('span', 'p13n-sc-pric').get_text().replace('\n', '')
+          price = li.find('span', 'p13n-sc-price').get_text().replace('\n', '')
         except AttributeError:
           price = ''
     
@@ -395,6 +395,8 @@ for i in range(0, len(srcs)):
             imgs.append(fp_name + str(i) + '.jpg')
         except:
             imgs.append('')
+    else:
+        imgs.append('')
 
 #Step 5. 검색 결과를 다양한 형태로 저장하기
 
@@ -416,15 +418,16 @@ wb = load_workbook(filename = fx_name, read_only = False, data_only = False)
 ws = wb.active
 
 for i in range(0, len(imgs)):
-    if(imgs[i] != ''):
-        img = Image(imgs[i])
-        
-        cellNum = i + 2
-        
-        ws.row_dimensions[cellNum].height = img.height * 0.75 + 15
-        ws.column_dimensions['C'].width = img.width * 0.125
-        
-        ws.add_image(img, 'C' + str(cellNum))
+    if(imgs[i] == ''):
+        continue
+    img = Image(imgs[i])
+    
+    cellNum = i + 2
+    
+    ws.row_dimensions[cellNum].height = img.height * 0.75 + 15
+    ws.column_dimensions['C'].width = img.width * 0.125
+    
+    ws.add_image(img, 'C' + str(cellNum))
 
 wb.save(fx_name)
 
