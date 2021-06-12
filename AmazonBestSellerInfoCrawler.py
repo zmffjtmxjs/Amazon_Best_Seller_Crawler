@@ -45,9 +45,6 @@ cnt = int(1)#int(input("        2. 해당 분야에서 크롤링 할 건수는 �
 f_dir = "E:/coding/3years/python/Amazon_Best_Seller_Info_Crawler/"#input("        3.파일을 저장할 폴더명만 쓰세요(예 : c:\\temp\\) : ")
 print("\n")
 
-sec -= 1 #배열 인덱스에 맞게 숫자 조정
-
-
 if cnt > 30:
     print("요청 건수가 많아서 시간이 제법 소요되오니 잠시만 기다려 주세요~~")
 else:
@@ -57,7 +54,7 @@ else:
 now = time.localtime()
 s = '%04d-%02d-%02d-%02d-%02d-%02d' % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
 
-sec_name = sec_names[sec]
+sec_name = sec_names[sec - 1]
 
 os.makedirs(f_dir + s + '-'+query_txt + '-' + sec_name)
 os.chdir(f_dir + s + '-' + query_txt + '-' + sec_name)
@@ -85,8 +82,8 @@ driver.find_element_by_xpath("""//*[@id="zg_browseRoot"]/ul/li[""" + str(sec) + 
 time.sleep(1)
 
 def scroll_down(driver):
-  driver.execute_script("window.scrollBy(0, 9300);")
-  time.sleep(1)
+    driver.execute_script("window.scrollBy(0, 9300);")
+    time.sleep(1)
 
 scroll_down(driver)
 
@@ -109,281 +106,281 @@ srcs = []
 
 if cnt < 51:
 
-  count = 0
+    count = 0
 
-  for li in slist:
-    f = open(ff_name, 'a', encoding = 'UTF-8')
-    f.write("-"*40 + "\n")
+    for li in slist:
+        f = open(ff_name, 'a', encoding = 'UTF-8')
+        f.write("-"*40 + "\n")
 
-    #판매순위
-    print("-"*70)
-    try:
-      ranking = li.find('span', class_='zg-badge-text').get_text().replace("#", "")
-    except AttributeError:
-      ranking = ''
-      print(ranking.replace("#", ""))
-    else:
-      print("1.판매순위 :", ranking)
-
-      f.write('1.판매순위 :' + ranking + '\n')
+        #판매순위
+        print("-"*70)
+        try:
+          ranking = li.find('span', class_='zg-badge-text').get_text().replace("#", "")
+        except AttributeError:
+          ranking = ''
+          print(ranking.replace("#", ""))
+        else:
+          print("1.판매순위 :", ranking)
     
-    #제품 이미지
-    try:
-        src  = li.find('span', class_='zg-text-center-align').find('img')['src']
-    except AttributeError:
-        src = ''
+          f.write('1.판매순위 :' + ranking + '\n')
         
-    #제품 설명
-    try:
-      title1 = li.find('div', class_='p13n-sc-truncated').get_text().replace('\n', '')
-    except AttributeError:
-      title = ''
-      print(title1.replace('\n', ''))
-      f.write('2.제품소개 : ' + title1 + '\n')
-    else:
-      title2 = title1.translate(bmp_map).replace('\n', '')
-      print('2.제품소개 :', title2.replace('\n', ''))
-
-    count += 1
-
-    f.write('2.제품소개 : ' + title2 + '\n')
-
-    #가격
-    try:
-      price = li.find('span', 'p13n-sc-pric').get_text().replace('\n', '')
-    except AttributeError:
-      price = ''
-
-    print('3.가격 :', price.replace('\n', ''))
-    f.write('3.가격 : ' + price + '\n')
-
-    #상품평 수
-    try:
-      sat_count = li.find('a', 'a-size-small a-link-normal').get_text().replace(',', '')
-    except (IndexError, AttributeError):
-      sat_count = '0'
-      print('4.상품평 수 :', sat_count)
-      f.write('4.상품평 수 : ' + sat_count + '\n')
-    else:
-      print('4.상품평 수 :', sat_count)
-      f.write('4.상품평 수 : ' + sat_count + '\n')
-
-    #상품 별점 구하기
-    try:
-      score = li.find('span', 'a-icon-alt').get_text()
-    except AttributeError:
-      score = ''
-
-    print('5.평점 :', score)
-    f.write('5.평점 : ' + score + '\n')
-
-    print('-' * 70)
-
-    f.close()
-
-    time.sleep(0.3)
-
-    ranking2.append(ranking)
-    title3.append(title2.replace('\n', ''))
-    price2.append(price.replace('\n', ''))
-    srcs.append(src)
-
-    try:
-      sat_count2.append(sat_count)
-    except IndexError:
-      sat_count2.append(0)
-
-    score2.append(score)
-
-    if count == cnt :
-      break
+        #제품 이미지
+        try:
+            src  = li.find('span', class_='zg-text-center-align').find('img')['src']
+        except AttributeError:
+            src = ''
+            
+        #제품 설명
+        try:
+          title1 = li.find('div', class_='p13n-sc-truncated').get_text().replace('\n', '')
+        except AttributeError:
+          title = ''
+          print(title1.replace('\n', ''))
+          f.write('2.제품소개 : ' + title1 + '\n')
+        else:
+          title2 = title1.translate(bmp_map).replace('\n', '')
+          print('2.제품소개 :', title2.replace('\n', ''))
+    
+        count += 1
+    
+        f.write('2.제품소개 : ' + title2 + '\n')
+    
+        #가격
+        try:
+          price = li.find('span', 'p13n-sc-pric').get_text().replace('\n', '')
+        except AttributeError:
+          price = ''
+    
+        print('3.가격 :', price.replace('\n', ''))
+        f.write('3.가격 : ' + price + '\n')
+    
+        #상품평 수
+        try:
+          sat_count = li.find('a', 'a-size-small a-link-normal').get_text().replace(',', '')
+        except (IndexError, AttributeError):
+          sat_count = '0'
+          print('4.상품평 수 :', sat_count)
+          f.write('4.상품평 수 : ' + sat_count + '\n')
+        else:
+          print('4.상품평 수 :', sat_count)
+          f.write('4.상품평 수 : ' + sat_count + '\n')
+    
+        #상품 별점 구하기
+        try:
+          score = li.find('span', 'a-icon-alt').get_text()
+        except AttributeError:
+          score = ''
+    
+        print('5.평점 :', score)
+        f.write('5.평점 : ' + score + '\n')
+    
+        print('-' * 70)
+    
+        f.close()
+    
+        time.sleep(0.3)
+    
+        ranking2.append(ranking)
+        title3.append(title2.replace('\n', ''))
+        price2.append(price.replace('\n', ''))
+        srcs.append(src)
+    
+        try:
+          sat_count2.append(sat_count)
+        except IndexError:
+          sat_count2.append(0)
+    
+        score2.append(score)
+    
+        if count == cnt :
+          break
 
 elif cnt >= 51 :
 
-  count = 0
+    count = 0
 
-  for li in slist:
-    f = open(ff_name, 'a', encoding = 'UTF-8')
-    f.write("-"*40 + "\n")
+    for li in slist:
+        f = open(ff_name, 'a', encoding = 'UTF-8')
+        f.write("-"*40 + "\n")
 
-    #판매순위
-    print("-"*70)
-    try:
-      ranking = li.find('span', class_='zg-badge-text').get_text().replace("#", "")
-    except AttributeError:
-      ranking = ''
-      print(ranking.replace("#", ""))
-    else:
-      print("1.판매순위 :", ranking)
+        #판매순위
+        print("-"*70)
+        try:
+            ranking = li.find('span', class_='zg-badge-text').get_text().replace("#", "")
+        except AttributeError:
+            ranking = ''
+            print(ranking.replace("#", ""))
+        else:
+            print("1.판매순위 :", ranking)
+    
+            f.write('1.판매순위 :' + ranking + '\n')
+          
+        #제품 이미지
+        try:
+            src  = li.find('div', class_='a-section a-spacing-mini').find('img')['src']
+        except AttributeError:
+            src = ''
+    
+        #제품 설명
+        try:
+            title1 = li.find('div', class_='p13n-sc-truncated').get_text().replace('\n', '')
+        except AttributeError:
+            title = ''
+            print(title1.replace('\n', ''))
+            f.write('2.제품소개 : ' + title1 + '\n')
+        else:
+            title2 = title1.translate(bmp_map).replace('\n', '')
+            print('2.제품소개 :', title2.replace('\n', ''))
+    
+            count += 1
+    
+            f.write('2.제품소개 : ' + title2 + '\n')
+    
+        #가격
+        try:
+            price = li.find('span', 'p13n-sc-pric').get_text().replace('\n', '')
+        except AttributeError:
+            price = ''
+    
+        print('3.가격 :', price.replace('\n', ''))
+        f.write('3.가격 : ' + price + '\n')
+    
+        #상품평 수
+        try:
+            sat_count = li.find('a', 'a-size-small a-link-normal').get_text().replace(',', '')
+        except (IndexError, AttributeError):
+            sat_count = '0'
+            print('4.상품평 수 :', sat_count)
+            f.write('4.상품평 수 : ' + sat_count + '\n')
+        else:
+            print('4.상품평 수 :', sat_count)
+            f.write('4.상품평 수 : ' + sat_count + '\n')
+    
+        #상품 별점 구하기
+        try:
+            score = li.find('span', 'a-icon-alt').get_text()
+        except AttributeError:
+            score = ''
+    
+        print('5.평점 :', score)
+        f.write('5.평점 : ' + score + '\n')
+    
+        print('-' * 70)
+    
+        f.close()
+    
+        time.sleep(0.3)
+    
+        ranking2.append(ranking)
+        title3.append(title2.replace('\n', ''))
+        price2.append(price.replace('\n', ''))
+        srcs.append(src)
+    
+        try:
+            sat_count2.append(sat_count)
+        except IndexError:
+            sat_count2.append(0)
+    
+        score2.append(score)
+    
+    
+    #1 페이지 추출 후 2페이지로 넘어감
+    driver.find_element_by_xpath("""//*[@id="zg-center-div"]/div[2]/div/ul/li[3]/a""").click()
+    print("\n")
+    print("요청하신 데이터의 수량이 많아 다음 페이지의 데이터를 추출 중이오니 잠시만 기다려 주세요~^^")
+    print("\n")
 
-      f.write('1.판매순위 :' + ranking + '\n')
+    html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+    reple_result = soup.select('#zg-center-div > #zg-ordered-list')
+    slist = reple_result[0].find_all('li')
+
+    for li in slist:
+        f = open(ff_name, 'a', encoding = 'UTF-8')
+        f.write("-"*40 + "\n")
+
+        #판매순위
+        print("-"*70)
+        try:
+            ranking = li.find('span', class_='zg-badge-text').get_text().replace("#", "")
+        except AttributeError:
+            ranking = ''
+            print(ranking.replace("#", ""))
+        else:
+            print("1.판매순위 :", ranking)
+
+        f.write('1.판매순위 :' + ranking + '\n')
       
-    #제품 이미지
-    try:
-        src  = li.find('div', class_='a-section a-spacing-mini').find('img')['src']
-    except AttributeError:
-        src = ''
+        #제품 이미지
+        try:
+            src  = li.find('div', class_='a-section a-spacing-mini').find('img')['src']
+        except AttributeError:
+            src = ''
+    
+        #제품 설명
+        try:
+            title1 = li.find('div', class_='p13n-sc-truncated').get_text().replace('\n', '')
+        except AttributeError:
+            title = ''
+            print(title1.replace('\n', ''))
+            f.write('2.제품소개 : ' + title1 + '\n')
+        else:
+            title2 = title1.translate(bmp_map).replace('\n', '')
+            print('2.제품소개 :', title2.replace('\n', ''))
+    
+        count += 1
+    
+        f.write('2.제품소개 : ' + title2 + '\n')
+    
+        #가격
+        try:
+            price = li.find('span', 'p13n-sc-pric').get_text().replace('\n', '')
+        except AttributeError:
+            price = ''
+    
+        print('3.가격 :', price.replace('\n', ''))
+        f.write('3.가격 : ' + price + '\n')
+    
+        #상품평 수
+        try:
+            sat_count = li.find('a', 'a-size-small a-link-normal').get_text().replace(',', '')
+        except (IndexError, AttributeError):
+            sat_count = '0'
+            print('4.상품평 수 :', sat_count)
+            f.write('4.상품평 수 : ' + sat_count + '\n')
+        else:
+            print('4.상품평 수 :', sat_count)
+            f.write('4.상품평 수 : ' + sat_count + '\n')
+    
+        #상품 별점 구하기
+        try:
+            score = li.find('span', 'a-icon-alt').get_text()
+        except AttributeError:
+            score = ''
+    
+        print('5.평점 :', score)
+        f.write('5.평점 : ' + score + '\n')
+    
+        print('-' * 70)
+    
+        f.close()
+          
+        time.sleep(0.3)
 
-    #제품 설명
-    try:
-      title1 = li.find('div', class_='p13n-sc-truncated').get_text().replace('\n', '')
-    except AttributeError:
-      title = ''
-      print(title1.replace('\n', ''))
-      f.write('2.제품소개 : ' + title1 + '\n')
-    else:
-      title2 = title1.translate(bmp_map).replace('\n', '')
-      print('2.제품소개 :', title2.replace('\n', ''))
+        ranking2.append(ranking)
+        title3.append(title2.replace('\n', ''))
+        price2.append(price.replace('\n', ''))
+        srcs.append(src)
 
-      count += 1
-
-      f.write('2.제품소개 : ' + title2 + '\n')
-
-    #가격
-    try:
-      price = li.find('span', 'p13n-sc-pric').get_text().replace('\n', '')
-    except AttributeError:
-      price = ''
-
-    print('3.가격 :', price.replace('\n', ''))
-    f.write('3.가격 : ' + price + '\n')
-
-    #상품평 수
-    try:
-      sat_count = li.find('a', 'a-size-small a-link-normal').get_text().replace(',', '')
-    except (IndexError, AttributeError):
-      sat_count = '0'
-      print('4.상품평 수 :', sat_count)
-      f.write('4.상품평 수 : ' + sat_count + '\n')
-    else:
-      print('4.상품평 수 :', sat_count)
-      f.write('4.상품평 수 : ' + sat_count + '\n')
-
-    #상품 별점 구하기
-    try:
-      score = li.find('span', 'a-icon-alt').get_text()
-    except AttributeError:
-      score = ''
-
-    print('5.평점 :', score)
-    f.write('5.평점 : ' + score + '\n')
-
-    print('-' * 70)
-
-    f.close()
-
-    time.sleep(0.3)
-
-    ranking2.append(ranking)
-    title3.append(title2.replace('\n', ''))
-    price2.append(price.replace('\n', ''))
-    srcs.append(src)
-
-    try:
-      sat_count2.append(sat_count)
-    except IndexError:
-      sat_count2.append(0)
-
-    score2.append(score)
-
-
-  #1 페이지 추출 후 2페이지로 넘어감
-  driver.find_element_by_xpath("""//*[@id="zg-center-div"]/div[2]/div/ul/li[3]/a""").click()
-  print("\n")
-  print("요청하신 데이터의 수량이 많아 다음 페이지의 데이터를 추출 중이오니 잠시만 기다려 주세요~^^")
-  print("\n")
-
-  html = driver.page_source
-  soup = BeautifulSoup(html, 'html.parser')
-  reple_result = soup.select('#zg-center-div > #zg-ordered-list')
-  slist = reple_result[0].find_all('li')
-
-  for li in slist:
-    f = open(ff_name, 'a', encoding = 'UTF-8')
-    f.write("-"*40 + "\n")
-
-    #판매순위
-    print("-"*70)
-    try:
-      ranking = li.find('span', class_='zg-badge-text').get_text().replace("#", "")
-    except AttributeError:
-      ranking = ''
-      print(ranking.replace("#", ""))
-    else:
-      print("1.판매순위 :", ranking)
-
-      f.write('1.판매순위 :' + ranking + '\n')
-      
-    #제품 이미지
-    try:
-        src  = li.find('div', class_='a-section a-spacing-mini').find('img')['src']
-    except AttributeError:
-        src = ''
-
-    #제품 설명
-    try:
-      title1 = li.find('div', class_='p13n-sc-truncated').get_text().replace('\n', '')
-    except AttributeError:
-      title = ''
-      print(title1.replace('\n', ''))
-      f.write('2.제품소개 : ' + title1 + '\n')
-    else:
-      title2 = title1.translate(bmp_map).replace('\n', '')
-      print('2.제품소개 :', title2.replace('\n', ''))
-
-      count += 1
-
-      f.write('2.제품소개 : ' + title2 + '\n')
-
-    #가격
-    try:
-      price = li.find('span', 'p13n-sc-pric').get_text().replace('\n', '')
-    except AttributeError:
-      price = ''
-
-    print('3.가격 :', price.replace('\n', ''))
-    f.write('3.가격 : ' + price + '\n')
-
-    #상품평 수
-    try:
-      sat_count = li.find('a', 'a-size-small a-link-normal').get_text().replace(',', '')
-    except (IndexError, AttributeError):
-      sat_count = '0'
-      print('4.상품평 수 :', sat_count)
-      f.write('4.상품평 수 : ' + sat_count + '\n')
-    else:
-      print('4.상품평 수 :', sat_count)
-      f.write('4.상품평 수 : ' + sat_count + '\n')
-
-    #상품 별점 구하기
-    try:
-      score = li.find('span', 'a-icon-alt').get_text()
-    except AttributeError:
-      score = ''
-
-    print('5.평점 :', score)
-    f.write('5.평점 : ' + score + '\n')
-
-    print('-' * 70)
-
-    f.close()
-      
-    time.sleep(0.3)
-
-    ranking2.append(ranking)
-    title3.append(title2.replace('\n', ''))
-    price2.append(price.replace('\n', ''))
-    srcs.append(src)
-
-    try:
-      sat_count2.append(sat_count)
-    except IndexError:
-      sat_count2.append(0)
-
-    score2.append(score)
-
-    if count == cnt :
-      break
+        try:
+          sat_count2.append(sat_count)
+        except IndexError:
+          sat_count2.append(0)
+    
+        score2.append(score)
+    
+        if count == cnt :
+          break
 
 else:
   print("검색 건수는 1건 - 최대 100 건까지만 가능합니다.")
