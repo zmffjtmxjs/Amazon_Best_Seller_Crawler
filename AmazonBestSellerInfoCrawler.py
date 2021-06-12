@@ -8,33 +8,36 @@ import pandas as pd
 import os
 from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
-
-print("아마존 닷컴의 분야별 Best Seller 상품 정보 추출")
+import requests
 
 query_txt = '아마존 닷컴'
-query_url = 'https://www.amazon.com/bestsellers?Id=NSGoogle'
-sec_names = ['Amazon Devices & Accessories', 'Amazon Launchpad', 'Appliances', 'Apps & Games', 'Arts, Crafts & Sewing', 'Audible Books & Originals', 'Automotive', 'Baby', 'Beauty & Personal Care', 'Books', 'CDs & Vinyl', 'Camera & Photo Products', 'Cell Phones & Accessories', 'Clothing, Shoes & Jewelry', 'Collectible Currencies', 'Computers & Accessories', 'Digital Educational Resources', 'Digital Music', 'Electronics', 'Entertainment Collectibles', 'Gift Cards', 'Grocery & Gourmet Food', 'Handmade Products', 'Health & Household', 'Home & Kitchen', 'Industrial & Scientific', 'Kindle Store', 'Kitchen & Dining', 'Magazine Subscriptions', 'Movies & TV', 'Musical Instruments', 'Office Products', 'Patio, Lawn & Garden', 'Pet Supplies', 'Software', 'Sports & Outdoors', 'Sports Collectibles', 'Tools & Home Improvement', 'Toys & Games', 'Video Games']
+query_url = 'https://www.amazon.com/bestsellers'
+
+print("아마존 닷컴의 분야별 Best Seller 상품 정보 크롤러")
+
+#크롬 드라이버를 활성화하지 않고 없이 html 받아오기
+response = requests.get(query_url)
+soup = BeautifulSoup(response.content, 'html.parser')
+
+reple_result = soup.select('#zg_browseRoot > ul')
+slist = reple_result[0].find_all('li')
+sec_names = []
+inputMsg = ''
+
+for i in slist:
+    sec_names.append(i.get_text())
+
+for i in range(0, len(sec_names)):
+    if (i % 3 == 0):
+        inputMsg += '\n'
+    inputMsg += '%2s%-32s' % (str(i + 1), ('.' + sec_names[i]))
+
+inputMsg += '\n' * 2 + '1.위 분야 중에서 자료를 수집할 분야의 번호를 선택하세요 : '
 
 while True:
-    sec = int(input('''
-1.Amazon Devices & Accessories  2.Amazon Launchpad              3.Appliances                    
-4.Apps & Games                  5.Arts, Crafts & Sewing         6.Audible Books & Originals     
-7.Automotive                    8.Baby                          9.Beauty & Personal Care        
-10.Books                        11.CDs & Vinyl                  12.Camera & Photo Products      
-13.Cell Phones & Accessories    14.Clothing, Shoes & Jewelry    15.Collectible Currencies       
-16.Computers & Accessories      17.Digital Educational Resources18.Digital Music                
-19.Electronics                  20.Entertainment Collectibles   21.Gift Cards                   
-22.Grocery & Gourmet Food       23.Handmade Products            24.Health & Household           
-25.Home & Kitchen               26.Industrial & Scientific      27.Kindle Store                 
-28.Kitchen & Dining             29.Magazine Subscriptions       30.Movies & TV                  
-31.Musical Instruments          32.Office Products              33.Patio, Lawn & Garden         
-34.Pet Supplies                 35.Software                     36.Sports & Outdoors            
-37.Sports Collectibles          38.Tools & Home Improvement     39.Toys & Games                 
-40.Video Games
+    sec = int(input(inputMsg))
 
-1.위 분야 중에서 자료를 수집할 분야의 번호를 선택하세요 : '''))
-
-    if ((sec > 0) & (sec < 41)):
+    if ((sec > 0) & (sec <= len(sec_names))):
         break
     else:
         print("잘못된 번호를 입력하였습니다.")
@@ -46,7 +49,7 @@ while True:
     else:
         print("검색 건수는 1건 - 최대 100 건까지만 가능합니다.")
 
-f_dir = "E:/coding/3years/python/Amazon_Best_Seller_Info_Crawler/"#input("3.파일을 저장할 폴더명만 쓰세요(예 : c:\\temp\\) : ")
+f_dir = input("3.파일을 저장할 폴더명만 쓰세요(예 : c:\\temp\\) : ")
 print("\n")
 
 
@@ -112,7 +115,7 @@ while True:
     
     for li in slist:
         f = open(fileName + '.txt', 'a', encoding = 'UTF-8')
-        f.write("-"*40 + "\n")
+        f.write("-" * 40 + "\n")
 
         #판매순위
         print("-"*70)
@@ -193,22 +196,22 @@ while True:
     
         score2.append(score)
         
-        print(src)
-        print(imageName + str(count) + '.jpg')
-        
         #이미지 저장
         if(src != ''):
             try:
-                urllib.request.urlretrieve(src, imageName + str(count) + '.jpg')
-                imgs.append(imageName + str(count) + '.jpg')
+                urllib.request.urlretrieve(src, imageName + str(count) + '.jpg')        #추출한 src를 통해 이미지 다운로드
+                imgs.append(imageName + str(count) + '.jpg')                            #다운로드된 이미지 경로 배열 입력
             except:
+                #다운로드 실패 시 공란 처리
                 imgs.append('')
         else:
+            #src를 가져오지 못했을 경우 공란 처리
             imgs.append('')
-    
+        
         if count == cnt :
           break
-      
+    
+    #지정한 검색 건수 도달 여부 확인
     if count == cnt :
         break
     else:
