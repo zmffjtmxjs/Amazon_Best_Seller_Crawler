@@ -49,20 +49,23 @@ while True:
 f_dir = "E:/coding/3years/python/Amazon_Best_Seller_Info_Crawler/"#input("3.파일을 저장할 폴더명만 쓰세요(예 : c:\\temp\\) : ")
 print("\n")
 
-now = time.localtime()
-s = '%04d-%02d-%02d-%02d-%02d-%02d' % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
+
 
 sec_name = sec_names[sec - 1]
 
+now = time.localtime()
+s = '%04d-%02d-%02d-%02d-%02d-%02d' % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
 
-os.makedirs(f_dir + s + '-'+query_txt + '-' + sec_name)
-os.chdir(f_dir + s + '-' + query_txt + '-' + sec_name)
+resultName = s + '-' + query_txt + '-' + sec_name
 
-resultDir = f_dir + s + '-' + query_txt + '-' + sec_name
-os.makedirs(resultDir + '/images')
+f_dir += resultName
 
-resultFile = resultDir + '\\' + s + '-' + query_txt + '-' + sec_name
-imageDir = resultFile + '/images/'
+os.makedirs(f_dir)
+os.chdir(f_dir)
+os.makedirs(f_dir + '/images')
+
+fileName = f_dir + '/' + resultName
+imageName = f_dir + '/images/'
 
 
 path = "E:/coding/3years/chrome driver/chromedriver.exe"
@@ -76,13 +79,6 @@ soup = BeautifulSoup(html, 'html.parser')
 
 reple_result = soup.select('#zg_browseRoot > ul')
 slist = reple_result[0].find_all('a')
-
-asdf = []
-for i in slist:
-    asdf.append(i.get_text())
-print(asdf)
-
-time.sleep(30)
 
 driver.find_element_by_xpath("""//*[@id="zg_browseRoot"]/ul/li[""" + str(sec) + """]/a""").click()
 
@@ -115,7 +111,7 @@ while True:
     slist = reple_result[0].find_all('li')
     
     for li in slist:
-        f = open(resultFile + '.txt', 'a', encoding = 'UTF-8')
+        f = open(fileName + '.txt', 'a', encoding = 'UTF-8')
         f.write("-"*40 + "\n")
 
         #판매순위
@@ -197,11 +193,14 @@ while True:
     
         score2.append(score)
         
+        print(src)
+        print(imageName + str(count) + '.jpg')
+        
         #이미지 저장
         if(src != ''):
             try:
-                urllib.request.urlretrieve(src, imageDir + str(count) + '.jpg')
-                imgs.append(imageDir + str(count) + '.jpg')
+                urllib.request.urlretrieve(src, imageName + str(count) + '.jpg')
+                imgs.append(imageName + str(count) + '.jpg')
             except:
                 imgs.append('')
         else:
@@ -233,25 +232,24 @@ amazon_best_seller['상품평 갯수'] = pd.Series(sat_count2)
 amazon_best_seller['상품평점'] = pd.Series(score2)
 
 #csv 형태로 저장
-amazon_best_seller.to_csv(resultFile + '.csv', encoding = "utf-8-sig", index = True)
+amazon_best_seller.to_csv(fileName + '.csv', encoding = "utf-8-sig", index = True)
 
-#엑셀 형태로 저장
-amazon_best_seller.to_excel(resultFile + '.xlsx', index = True)
+#엑셀 형태로 저장하기
+amazon_best_seller.to_excel(fileName + '.xlsx', index = True)
 
 #그림추가
-wb = load_workbook(filename = resultFile + 'xlsx', read_only = False, data_only = False)
+wb = load_workbook(filename = fileName + '.xlsx', read_only = False, data_only = False)
 ws = wb.active
 
 for i in range(0, len(imgs)):
-    if(imgs[i] == ''):
-        continue
-    img = Image(imgs[i])
-    
-    cellNum = i + 2
-    
-    ws.row_dimensions[cellNum].height = img.height * 0.75 + 16
-    ws.column_dimensions['C'].width = 122
-    
-    ws.add_image(img, 'C' + str(cellNum))
+    if(imgs[i] != ''):                                                  #이미지 파일 누락 시 건너뜀
+        img = Image(imgs[i])                                            #추가 할 이미지 파일 위치
+        
+        cellNum = i + 2                                                 #셀 크기 조절 대상을 이미지 저장 위치에 맞춤
+        
+        ws.row_dimensions[cellNum].height = img.height * 0.75 + 16      #이미지 크기에 맞게 높이 조절
+        ws.column_dimensions['C'].width = 102                           #제목 최대 길이에 맞게 넓이 조절
+        
+        ws.add_image(img, 'C' + str(cellNum))                           #이미지를 엑셀에 추가
 
-wb.save(resultFile + '.xlsx')
+wb.save(fileName + '.xlsx')
